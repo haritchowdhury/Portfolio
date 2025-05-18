@@ -38,16 +38,6 @@ export function BlogPosts() {
               )}
 
               <div className="flex items-center text-xs font-medium mt-2">
-                {post.metadata.tags &&
-                  post.metadata.tags.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      className="mr-2 px-2 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 rounded-md"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-
                 <span className="text-indigo-600 dark:text-indigo-400 flex items-center ml-auto group-hover:translate-x-0.5 transition-transform">
                   Read more
                   <svg

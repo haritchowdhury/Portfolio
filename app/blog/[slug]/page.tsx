@@ -58,11 +58,17 @@ export default function Blog({ params }) {
 
   if (!post) {
     notFound();
+    // TypeScript doesn't recognize that notFound() prevents further execution
+    // Adding a return statement to satisfy TypeScript
+    return null;
   }
+
+  // Now TypeScript knows post is defined
+  const postSlug = post.slug;
 
   // Get related posts (excluding current post)
   const relatedPosts = getBlogPosts()
-    .filter((p) => p.slug !== post.slug)
+    .filter((p) => p.slug !== postSlug)
     .sort((a, b) => {
       if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
         return -1;
@@ -133,7 +139,7 @@ export default function Blog({ params }) {
           {post.metadata.title}
         </h1>
 
-        {post.metadata.summary && (
+        {post.metadata.summary && typeof post.metadata.summary === "string" && (
           <p className="text-xl text-neutral-600 dark:text-neutral-400 mb-6 leading-relaxed">
             {post.metadata.summary}
           </p>
@@ -156,45 +162,9 @@ export default function Blog({ params }) {
             </div>
           </div>
 
-          {post.metadata.tags && (
-            <div className="flex flex-wrap gap-2">
-              {post.metadata.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full text-sm font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Only render tags if they exist */}
         </div>
       </div>
-
-      {/* Table of Contents (optional) */}
-      {post.metadata.showToc && (
-        <div className="bg-neutral-50 dark:bg-neutral-900 rounded-lg p-6 mb-8 border border-neutral-200 dark:border-neutral-800">
-          <h2 className="text-lg font-semibold mb-4 flex items-center">
-            <svg
-              className="w-5 h-5 mr-2 text-indigo-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h7"
-              />
-            </svg>
-            Table of Contents
-          </h2>
-          <div className="prose prose-sm dark:prose-invert">
-            {/* This would be populated by your MDX component */}
-          </div>
-        </div>
-      )}
 
       {/* Article Content */}
       <article className="prose prose-lg dark:prose-invert prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-headings:tracking-tight prose-headings:scroll-mt-20 prose-img:rounded-lg prose-code:rounded-md prose-code:bg-neutral-100 dark:prose-code:bg-neutral-800 prose-code:px-1 prose-code:py-0.5 prose-code:font-normal prose-code:before:content-none prose-code:after:content-none max-w-none mb-12">
@@ -223,6 +193,35 @@ export default function Blog({ params }) {
             </svg>
             Back to All Posts
           </Link>
+
+          <div className="flex space-x-4">
+            <a
+              href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                `${baseUrl}/blog/${post.slug}`
+              )}&text=${encodeURIComponent(post.metadata.title)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-500 hover:text-blue-400 transition-colors"
+            >
+              <span className="sr-only">Share on Twitter</span>
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+              </svg>
+            </a>
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                `${baseUrl}/blog/${post.slug}`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-500 hover:text-blue-700 transition-colors"
+            >
+              <span className="sr-only">Share on LinkedIn</span>
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path>
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -249,11 +248,12 @@ export default function Blog({ params }) {
                 <time className="text-sm text-neutral-500 dark:text-neutral-400">
                   {formatDate(relatedPost.metadata.publishedAt, false)}
                 </time>
-                {relatedPost.metadata.summary && (
-                  <p className="text-neutral-600 dark:text-neutral-400 mt-2 line-clamp-2">
-                    {relatedPost.metadata.summary}
-                  </p>
-                )}
+                {relatedPost.metadata.summary &&
+                  typeof relatedPost.metadata.summary === "string" && (
+                    <p className="text-neutral-600 dark:text-neutral-400 mt-2 line-clamp-2">
+                      {relatedPost.metadata.summary}
+                    </p>
+                  )}
               </Link>
             ))}
           </div>
