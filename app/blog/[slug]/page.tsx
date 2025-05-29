@@ -167,6 +167,23 @@ export default function Blog({ params }) {
       </div>
 
       {/* Article Content */}
+      <div className="flex gap-2 m-2">
+        {post.metadata.demo !== "Redacted" && (
+          <Link
+            href={`${post.metadata.demo}`}
+            className="no-underline bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4  rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          >
+            Live link
+          </Link>
+        )}
+        <Link
+          href={`${post.metadata.code}`}
+          className="no-underline bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4  rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+        >
+          Code
+        </Link>
+      </div>
+
       <article className="prose prose-lg dark:prose-invert prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-headings:tracking-tight prose-headings:scroll-mt-20 prose-img:rounded-lg prose-code:rounded-md prose-code:bg-neutral-100 dark:prose-code:bg-neutral-800 prose-code:px-1 prose-code:py-0.5 prose-code:font-normal prose-code:before:content-none prose-code:after:content-none max-w-none mb-12">
         <CustomMDX source={post.content} />
       </article>
